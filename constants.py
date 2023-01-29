@@ -1,0 +1,8 @@
+BOARD_WIDTH = 600
+BOARD_HEIGHT = 600
+BOARD_BG = 'white'
+BOARD_MOVEMENT_MODE = '<B1-Motion>'
+BOARD_DELETE_MODE = 'all'
+CLEAR_BUTTON_TEXT = 'Clear Canvas'
+DRAW_FILL = 'blue'
+DRAW_OUTLINE = 'blue'
