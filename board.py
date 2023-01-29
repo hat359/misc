@@ -25,6 +25,7 @@ class Board:
 
     def onClearButtonClick(self):
         self.board.delete(BOARD_DELETE_MODE)
+        print(LOG_BOARD_CLEARED)
 
     def draw(self, event):
         x1 = (event.x-2)
