@@ -15,7 +15,8 @@ class Board:
 
     def setBindings(self):
         # Creating bindings for board
-        self.board.bind(BOARD_MOVEMENT_MODE, self.draw)
+        self.board.bind(MOUSE_DRAG_MODE, self.draw)
+        self.board.bind(MOUSE_UP_MODE, self.mouseUp)
         self.board.pack()
 
 
@@ -33,3 +34,6 @@ class Board:
         x2 = (event.x+2)
         y2 = (event.y+2)
         self.board.create_oval(x1, y1, x2, y2, fill=DRAW_FILL, outline=DRAW_OUTLINE)
+
+    def mouseUp(self, event):
+        print(LOG_DRAWING_FINISHED)

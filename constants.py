@@ -1,9 +1,11 @@
 BOARD_WIDTH = 600
 BOARD_HEIGHT = 600
 BOARD_BG = 'white'
-BOARD_MOVEMENT_MODE = '<B1-Motion>'
+MOUSE_DRAG_MODE = '<B1-Motion>'
+MOUSE_UP_MODE = '<ButtonRelease-1>'
 BOARD_DELETE_MODE = 'all'
 CLEAR_BUTTON_TEXT = 'Clear Canvas'
 DRAW_FILL = 'blue'
 DRAW_OUTLINE = 'blue'
 LOG_BOARD_CLEARED = 'Canvas cleared by User'
+LOG_DRAWING_FINISHED = 'Drawing Finished'
