@@ -14,8 +14,8 @@ class Board:
         self.clearButton = Button(self.root, text=CLEAR_BUTTON_TEXT)
 
     def setBindings(self):
-        # Creating bindings for board
-        self.board.bind(MOUSE_DRAG_MODE, self.draw)
+        # Creating bindings for board (draw handles mouse down and drag events)
+        self.board.bind(MOUSE_DRAG_MODE, self.draw) 
         self.board.bind(MOUSE_UP_MODE, self.mouseUp)
         self.board.pack()
 
