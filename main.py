@@ -1,10 +1,11 @@
-from tkinter import *
-from board import Board
+from tkinter import * #tkinter library for GUI 
+from board import Board #board.py contains all the functions. 
 
 def main():
-    root = Tk()
-    board = Board(root)
+    root = Tk() #initializig the tkinter lib. 
+    board = Board(root) 
     root.mainloop()
+    
 
 if __name__ == '__main__':
     main()
