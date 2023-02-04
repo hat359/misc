@@ -1,9 +1,7 @@
-from tkinter import *
+from tkinter import Canvas, Button
 from constants import * # importing from constants.py
-import math
 from copy import deepcopy
 from recognizer import Recognizer
-from time import sleep
 
 class Board:
     def __init__(self, root):

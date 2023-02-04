@@ -1,5 +1,4 @@
 from templates import template1
-from copy import deepcopy
 from math import sqrt,atan2,cos,sin
 
 class Recognizer:
