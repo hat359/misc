@@ -1,9 +1,26 @@
 from templates import template1
-from math import sqrt,atan2,cos,sin
+from constants import *
+from math import sqrt,atan2,cos,sin,pi
 
 class Recognizer:
     def __init__(self):
         self.template = template1.template
+        self.preProcessTemplates()
+        
+    def preProcessTemplates(self):
+        template = self.template
+        self.template = {}
+        for gesture in template.keys():
+            points = template[gesture]
+            points = self.resample(points, SAMPLING_POINTS)
+            points = self.rotate(points)
+            points = self.scale(points, SCALE_FACTOR)
+            points = self.translate(points, ORIGIN)
+            self.template[gesture] = points
+        self.printTemplateStats()
+    
+    def getGestureFromTemplate(self, gesture):
+        return self.template[gesture]
     
     def printTemplateStats(self):
         for template,points in self.template.items():
@@ -28,9 +45,10 @@ class Recognizer:
             newpoints.append(points[-1])
         return newpoints
     
-    def rotate(self, points):
+    def rotate(self, points, angle=None):
         centroid = self.getCentroid(points)
-        angle = self.getIndicativeAngle(centroid, points[0])
+        if angle is None:
+            angle = self.getIndicativeAngle(centroid, points[0])
         newpoints = []
         for i in range(len(points)):
             qx = (points[i][0] - centroid[0]) * cos(angle) - (points[i][1] - centroid[1]) * sin(angle) + centroid[0]
@@ -55,6 +73,42 @@ class Recognizer:
             qy = point[1] + origin[1] - centroid[1]
             newpoints.append([qx, qy])
         return newpoints
+
+    def recognizeGesture(self, points):
+        bestDistance = float("inf")
+        recognizedGesture = None
+        for gesture, templatePoints in self.template.items():
+            distance = self.DistanceAtBestAngle(points, templatePoints, -self.Deg2Rad(45), self.Deg2Rad(45), self.Deg2Rad(2))
+            if distance < bestDistance:
+                bestDistance = distance
+                recognizedGesture = gesture
+        score = 1 - bestDistance/(0.5*sqrt(SCALE_FACTOR**2 + SCALE_FACTOR**2))
+        return recognizedGesture, score
+
+    def DistanceAtBestAngle(self, candidatePoints, templatePoints, a, b, threshold):
+        Phi = 0.5 * (-1.0 + sqrt(5.0))
+        x1 = Phi * a + (1.0 - Phi) * b
+        f1 = self.DistanceAtAngle(candidatePoints, templatePoints, x1)
+        x2 = (1.0 - Phi) * a + Phi * b
+        f2 = self.DistanceAtAngle(candidatePoints, templatePoints, x2)
+        while abs(b - a) > threshold:
+            if f1 < f2:
+                b = x2
+                x2 = x1
+                f2 = f1
+                x1 = Phi * a + (1.0 - Phi) * b
+                f1 = self.DistanceAtAngle(candidatePoints, templatePoints, x1)
+            else:
+                a = x1
+                x1 = x2
+                f1 = f2
+                x2 = (1.0 - Phi) * a + Phi * b
+                f2 = self.DistanceAtAngle(candidatePoints, templatePoints, x2)
+        return min(f1, f2)
+    
+    def DistanceAtAngle(self, candidatePoints, templatePoints, angle):
+        newpoints = self.rotate(candidatePoints, angle)
+        return self.PathDistance(newpoints, templatePoints)
 
 
     def getBoundingBox(self, points):
@@ -93,4 +147,13 @@ class Recognizer:
 
     def getIndicativeAngle(self, centroid, startPoint):
         return atan2(centroid[1] - startPoint[1], centroid[0] - startPoint[0])
+
+    def Deg2Rad(self, angle):
+        return angle * pi / 180.0
+
+    def PathDistance(self, pointA, pointB):
+        distance = 0.0
+        for i in range(len(pointA)):
+            distance += self.getDistance(pointA[i], pointB[i])
+        return distance / len(pointA)
 
