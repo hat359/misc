@@ -57,6 +57,10 @@ class Board:
 
     def onResampleButtonClick(self):
         resampledPoints = self.recognizer.resample(deepcopy(self.points), SAMPLING_POINTS)
-        self.reDraw(resampledPoints, RED)
+        # self.reDraw(resampledPoints, RED)
         rotatedPoints = self.recognizer.rotate(resampledPoints)
-        self.reDraw(rotatedPoints, BLACK)
+        # self.reDraw(rotatedPoints, BLACK)
+        scaledPoints = self.recognizer.scale(rotatedPoints, SCALE_FACTOR)
+        # self.reDraw(scaledPoints, GREEN)
+        translatedPoints = self.recognizer.translate(scaledPoints, [300,300])
+        self.reDraw(translatedPoints, ORANGE)

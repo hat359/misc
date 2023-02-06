@@ -37,6 +37,35 @@ class Recognizer:
             qy = (points[i][0] - centroid[0]) * sin(angle) + (points[i][1] - centroid[1]) * cos(angle) + centroid[0]
             newpoints.append([qx,qy])
         return newpoints
+    
+    def scale(self, points, size):
+        xStart, YStart, width, height = self.getBoundingBox(points)
+        newpoints = []
+        for point in points:
+            qx = point[0] * (size / width)
+            qy = point[1] * (size / height)
+            newpoints.append([qx, qy])
+        return newpoints
+    
+    def translate(self, points, origin):
+        centroid = self.getCentroid(points)
+        newpoints = []
+        for point in points:
+            qx = point[0] + origin[0] - centroid[0]
+            qy = point[1] + origin[1] - centroid[1]
+            newpoints.append([qx, qy])
+        return newpoints
+
+
+    def getBoundingBox(self, points):
+        minX, maxX, minY, maxY = float('inf'), float('-inf'), float('inf'), float('-inf')
+        for point in points:
+            minX = min(minX, point[0])
+            minY = min(minY, point[1])
+            maxX = max(maxX, point[0])
+            maxY = max(maxY, point[1])
+        return (minX, minY, maxX - minX, maxY - minY)
+
 
     def getInterpolatedPoints(self, pointA, pointB, accumulatedDistance, currentDistance, incrementDistance):
         pointX = pointA[0] + ((incrementDistance - accumulatedDistance) / currentDistance) * (pointB[0] - pointA[0])
