@@ -1,4 +1,4 @@
-from tkinter import Canvas, Button
+from tkinter import Canvas, Button,Label
 from constants import * # importing from constants.py
 from copy import deepcopy
 from recognizer import Recognizer
@@ -10,6 +10,8 @@ class Board:
         self.setBindings()
         self.points = []
         self.recognizer = Recognizer()
+        self.w=0
+        self.x=0
 
     def createWidgets(self):
         # Creating canvas
@@ -36,6 +38,8 @@ class Board:
     def onClearButtonClick(self): # clicking the clear button fires this function.
         self.points.clear() 
         self.board.delete(BOARD_DELETE_MODE) # clears everything on the canvas
+        self.w.after(1000, self.w.destroy())
+        self.x.after(100, self.x.destroy())
         print(LOG_BOARD_CLEARED)
 
     def draw(self, event): # the main function that generates the strokes on the canvas. 
@@ -46,24 +50,41 @@ class Board:
         self.board.create_oval(x1, y1, x2, y2, fill=BLUE, outline=BLUE)
         self.points.append([event.x,event.y])
 
-    def reDraw(self, points, color):
+    def reDraw(self, points, color,fxn):
         print("Redrawing...")
-        for i in range(len(points)):
-            x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
-            self.board.create_oval(x1, y1, x2, y2, fill=color, outline=color)
+        if fxn == "resample":
+            for i in range(len(points)):
+                x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
+                self.board.create_oval(x1+200, y1, x2+200, y2, fill=color, outline=color)
+
+        if fxn == "rotated":
+            for i in range(len(points)):
+                x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
+                self.board.create_oval(x1+400, y1+100, x2+400, y2+100, fill=color, outline=color)
+        
+        if fxn == "scaled":
+             for i in range(len(points)):
+                x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
+                self.board.create_oval(x1+400, y1, x2+400, y2, fill=color, outline=color)
+
         
     def mouseUp(self, event):# logs the mouseup event. 
         print(LOG_DRAWING_FINISHED)
 
     def onResampleButtonClick(self):
         resampledPoints = self.recognizer.resample(deepcopy(self.points), SAMPLING_POINTS)
-        # self.reDraw(resampledPoints, RED)
+        self.reDraw(resampledPoints, RED,"resample")
         rotatedPoints = self.recognizer.rotate(resampledPoints)
+        self.reDraw(rotatedPoints, ORANGE,"rotated")
         # self.reDraw(rotatedPoints, BLACK)
         scaledPoints = self.recognizer.scale(rotatedPoints, SCALE_FACTOR)
-        self.board.create_rectangle(150,150,450,450, fill=BLACK, outline=BLACK)
+        # self.board.create_rectangle(150,150,450,450, fill='white', outline='white')
         # self.reDraw(scaledPoints, GREEN)
         translatedPoints = self.recognizer.translate(scaledPoints, ORIGIN)
-        self.reDraw(translatedPoints, ORANGE)
+        self.reDraw(translatedPoints, GREEN,"scaled")
         recognizedGesture = self.recognizer.recognizeGesture(translatedPoints)
-        print(recognizedGesture)
+        print(recognizedGesture[0])
+        self.w = Label(self.root, text="Predicted Shape = "  + recognizedGesture[0])
+        self.w.pack()
+        self.x = Label(self.root, text="Confidence = "  + str(recognizedGesture[1]))
+        self.x.pack()

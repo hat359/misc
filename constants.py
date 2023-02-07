@@ -1,6 +1,6 @@
 #this file has all the constants that are utilized in the code. 
 
-BOARD_WIDTH = 600 # width and height of the canvas
+BOARD_WIDTH = 1000 # width and height of the canvas
 BOARD_HEIGHT = 600
 BOARD_BG = 'white' # background color of the canvas.  
 MOUSE_DRAG_MODE = '<B1-Motion>' # defines the action of the mouse
@@ -10,6 +10,7 @@ CLEAR_BUTTON_TEXT = 'Clear Canvas'
 RESAMPLE= 'Resample'
 BLUE = 'blue' # color of the stroke
 RED = 'red' # color of the stroke
+GREEN='green'
 YELLOW = 'yellow'
 BLACK = 'black' # color of the stroke
 GREEN = 'green' # color of the stroke
