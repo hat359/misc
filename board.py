@@ -10,16 +10,14 @@ class Board:
         self.setBindings()
         self.points = []
         self.recognizer = Recognizer()
-        self.w=0
-        self.x=0
 
     def createWidgets(self):
-        # Creating canvas
         self.board = Canvas(self.root, width=BOARD_WIDTH, height=BOARD_HEIGHT, bg=BOARD_BG)
-        # Creating clear button
         self.resampleButton = Button(self.root, text=RESAMPLE)
         self.resampleButton.place(x=100,y=100)
         self.clearButton = Button(self.root, text=CLEAR_BUTTON_TEXT)
+        self.predictedGestureLabel = Label(self.root)
+        self.confidenceLabel = Label(self.root)
         
 
     def setBindings(self):
@@ -35,11 +33,14 @@ class Board:
         self.resampleButton.configure(command=self.onResampleButtonClick)
         self.resampleButton.pack()
 
+        self.predictedGestureLabel.pack()
+        self.confidenceLabel.pack()
+
     def onClearButtonClick(self): # clicking the clear button fires this function.
         self.points.clear() 
         self.board.delete(BOARD_DELETE_MODE) # clears everything on the canvas
-        self.w.after(1000, self.w.destroy())
-        self.x.after(100, self.x.destroy())
+        self.predictedGestureLabel.configure(text="")
+        self.confidenceLabel.configure(text="")
         print(LOG_BOARD_CLEARED)
 
     def draw(self, event): # the main function that generates the strokes on the canvas. 
@@ -51,7 +52,6 @@ class Board:
         self.points.append([event.x,event.y])
 
     def reDraw(self, points, color,fxn):
-        print("Redrawing...")
         if fxn == "resample":
             for i in range(len(points)):
                 x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
@@ -76,15 +76,10 @@ class Board:
         self.reDraw(resampledPoints, RED,"resample")
         rotatedPoints = self.recognizer.rotate(resampledPoints)
         self.reDraw(rotatedPoints, ORANGE,"rotated")
-        # self.reDraw(rotatedPoints, BLACK)
         scaledPoints = self.recognizer.scale(rotatedPoints, SCALE_FACTOR)
-        # self.board.create_rectangle(150,150,450,450, fill='white', outline='white')
-        # self.reDraw(scaledPoints, GREEN)
         translatedPoints = self.recognizer.translate(scaledPoints, ORIGIN)
         self.reDraw(translatedPoints, GREEN,"scaled")
         recognizedGesture = self.recognizer.recognizeGesture(translatedPoints)
         print(recognizedGesture[0])
-        self.w = Label(self.root, text="Predicted Shape = "  + recognizedGesture[0])
-        self.w.pack()
-        self.x = Label(self.root, text="Confidence = "  + str(recognizedGesture[1]))
-        self.x.pack()
+        self.predictedGestureLabel.configure(text="Predicted Gesture = "  + str(recognizedGesture[0]))
+        self.confidenceLabel.configure(text="Confidence = "  + str(recognizedGesture[1]))

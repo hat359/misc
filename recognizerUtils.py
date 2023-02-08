@@ -1,12 +1,13 @@
-from math import sqrt,pi,atan2
+from math import sqrt,pi,atan2,cos,sin
+from constants import *
 
 def getDistance(pointA, pointB):
     x_difference = abs(pointA[0] - pointB[0])
     y_difference = abs(pointA[1] - pointB[1])
     return sqrt(x_difference**2 + y_difference**2)
 
-def Deg2Rad(angle):
-    return angle * pi / 180.0
+def radians(angle):
+    return angle*pi/180.0
 
 def getTotalPathLength(points):
     total_distance = 0
@@ -14,11 +15,16 @@ def getTotalPathLength(points):
         total_distance += getDistance(points[i], points[i+1])
     return total_distance
 
-def PathDistance(pointA, pointB):
+def PathDistance(pointSetA, pointSetB):
     distance = 0.0
-    for i in range(len(pointA)):
-        distance += getDistance(pointA[i], pointB[i])
-    return distance / len(pointA)
+    for i in range(len(pointSetA)):
+        distance += getDistance(pointSetA[i], pointSetB[i])
+    return distance / len(pointSetA)
+
+def getRotatedPoints(point, centroid, angle):
+    newX = (point[0] - centroid[0]) * cos(angle) - (point[1] - centroid[1]) * sin(angle) + centroid[0]
+    newY = (point[0] - centroid[0]) * sin(angle) + (point[1] - centroid[1]) * cos(angle) + centroid[1]
+    return [newX, newY]
 
 def getIndicativeAngle(centroid, startPoint):
     return atan2(centroid[1] - startPoint[1], centroid[0] - startPoint[0])
@@ -44,3 +50,9 @@ def getBoundingBox(points):
         maxX = max(maxX, point[0])
         maxY = max(maxY, point[1])
     return (minX, minY, maxX - minX, maxY - minY)
+
+def getConvergentAngle(leftBound, rightBound, direction):
+    if direction == 'left':
+        return GOLDEN_RATIO*leftBound+(1.0-GOLDEN_RATIO)*rightBound
+    else:
+        return (1.0-GOLDEN_RATIO)*leftBound+GOLDEN_RATIO*rightBound
