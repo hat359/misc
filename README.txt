@@ -31,3 +31,30 @@ Running the Code -
 Interaction - 
     1. Draw on the canvas with mouse or touch (laptops with touch screens). 
     2. Click on the clear button to clear the canvas.   
+
+
+
+Part 2 
+
+Resampling 
+    The resampling is triggered on clicking the resample button. It fires up the resample function in the recognizer.py file. 
+    It calculates the avrage distance between each point and if the distance between two adjacent points is greater 
+    than the calculated average distance it inserts a new point in between them. 
+
+Rotate 
+
+    The centroid of the figure is calculated by running the rotate function in the recognizer.py file. It translates the 
+    points to the origin and calculates an indicative angle by which the figure is to be rotated. It then translates the points 
+    back to it original position. 
+
+Scale 
+    
+    The scale function is run which first calculates the coordinates of the bounding box and its height and width which basically 
+    indicates the total height and width of the figure. It then calculates the new points by multiplying each point by a constant value. 
+    This value is calculated by dividing the scale factor by the width for all the x coordinates and by height for all the y coordinates.\
+
+Translate 
+
+    The translate function is run which takes an input of the destination coordinates to where the figure is to be translated. 
+    It then calculates the distance between the centroid and the destination coordinates and then adds the difference to the x and y \
+    coordinates of each point.  
