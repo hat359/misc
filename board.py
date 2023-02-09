@@ -13,8 +13,6 @@ class Board:
 
     def createWidgets(self):
         self.board = Canvas(self.root, width=BOARD_WIDTH, height=BOARD_HEIGHT, bg=BOARD_BG)
-        self.resampleButton = Button(self.root, text=RESAMPLE)
-        self.resampleButton.place(x=100,y=100)
         self.clearButton = Button(self.root, text=CLEAR_BUTTON_TEXT)
         self.predictedGestureLabel = Label(self.root)
         self.confidenceLabel = Label(self.root)
@@ -30,20 +28,21 @@ class Board:
         self.clearButton.configure(command=self.onClearButtonClick)
         self.clearButton.pack()
 
-        self.resampleButton.configure(command=self.onResampleButtonClick)
-        self.resampleButton.pack()
-
+        # Create bindings for predicted gesture label and confidence label
         self.predictedGestureLabel.pack()
         self.confidenceLabel.pack()
 
-    def onClearButtonClick(self): # clicking the clear button fires this function.
+    # Handler for clear button click
+    def onClearButtonClick(self):
         self.points.clear() 
-        self.board.delete(BOARD_DELETE_MODE) # clears everything on the canvas
+        # Clears everything on the canvas
+        self.board.delete(BOARD_DELETE_MODE)
         self.predictedGestureLabel.configure(text="")
         self.confidenceLabel.configure(text="")
         print(LOG_BOARD_CLEARED)
 
-    def draw(self, event): # the main function that generates the strokes on the canvas. 
+    # Draws when mouse drag or screen touch event occurs
+    def draw(self, event):
         x1 = (event.x-2)
         y1 = (event.y-2)
         x2 = (event.x+2)
@@ -51,6 +50,7 @@ class Board:
         self.board.create_oval(x1, y1, x2, y2, fill=BLUE, outline=BLUE)
         self.points.append([event.x,event.y])
 
+    # Draws different states of user input (resampled,rotated,scaled)
     def reDraw(self, points, color,fxn):
         if fxn == "resample":
             for i in range(len(points)):
@@ -67,11 +67,8 @@ class Board:
                 x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
                 self.board.create_oval(x1+400, y1, x2+400, y2, fill=color, outline=color)
 
-        
-    def mouseUp(self, event):# logs the mouseup event. 
-        print(LOG_DRAWING_FINISHED)
-
-    def onResampleButtonClick(self):
+    # Mouse up event handler
+    def mouseUp(self, event):
         resampledPoints = self.recognizer.resample(deepcopy(self.points), SAMPLING_POINTS)
         self.reDraw(resampledPoints, RED,"resample")
         rotatedPoints = self.recognizer.rotate(resampledPoints)
@@ -82,4 +79,5 @@ class Board:
         recognizedGesture = self.recognizer.recognizeGesture(translatedPoints)
         print(recognizedGesture[0])
         self.predictedGestureLabel.configure(text="Predicted Gesture = "  + str(recognizedGesture[0]))
-        self.confidenceLabel.configure(text="Confidence = "  + str(recognizedGesture[1]))
+        self.confidenceLabel.configure(text="Confidence = "  + str(recognizedGesture[1])) 
+        print(LOG_DRAWING_FINISHED)

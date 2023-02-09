@@ -7,7 +7,8 @@ class Recognizer:
     def __init__(self):
         self.template = template1.template
         self.preProcessTemplates()
-        
+
+    # Apply the resampling, rotating, scaling and translate operations to templates    
     def preProcessTemplates(self):
         template = self.template
         self.template = {}
@@ -20,13 +21,16 @@ class Recognizer:
             self.template[gesture] = points
         self.printTemplateStats()
     
+    # Get individual gestures from template
     def getGestureFromTemplate(self, gesture):
         return self.template[gesture]
     
+    # Used to print all the gesture names and the number of points in each gesture
     def printTemplateStats(self):
         for template,points in self.template.items():
             print(template,len(points))
 
+    # Resample the points in a a user drawn gesture
     def resample(self, points, N):
         incrementDistance = getTotalPathLength(points)/(N-1)
         accumulatedDistance = 0.0
@@ -46,6 +50,7 @@ class Recognizer:
             newpoints.append(points[-1])
         return newpoints
     
+    # Rotate the points in a user drawn gesture with a given angle or around the centroid
     def rotate(self, points, angle=None):
         centroid = getCentroid(points)
         if angle is None:
@@ -55,13 +60,15 @@ class Recognizer:
             newpoints.append(getRotatedPoints(points[i],centroid,angle))
         return newpoints
     
+    # Scale with respect to a bounding box which tightly encloses the gesture
     def scale(self, points, size):
-        xStart, YStart, width, height = getBoundingBox(points)
+        width, height = getBoundingBox(points)
         newpoints = []
         for point in points:
             newpoints.append([point[0]*(size/width), point[1]*(size/height)])
         return newpoints
     
+    # Translate the points to the origin
     def translate(self, points, origin):
         centroid = getCentroid(points)
         newpoints = []
@@ -69,6 +76,7 @@ class Recognizer:
             newpoints.append([point[0]+origin[0]-centroid[0], point[1]+origin[1]-centroid[1]])
         return newpoints
 
+    # Recognize the gesture by comparing the user drawn gesture with template
     def recognizeGesture(self, points):
         bestDistance = float("inf")
         recognizedGesture = None
@@ -77,9 +85,11 @@ class Recognizer:
             if distance < bestDistance:
                 bestDistance = distance
                 recognizedGesture = gesture
+        # Calculate confidence of best matching gesture template
         score = 1 - bestDistance/(0.5*sqrt(SCALE_FACTOR**2 + SCALE_FACTOR**2))
         return recognizedGesture, score
 
+    # Get the optimal angle for best distance bewteen user drawn gesture and all templates
     def DistanceAtBestAngle(self, candidatePoints, templatePoints, leftBound, rightBound, threshold):
         leftConvergentAngle = getConvergentAngle(leftBound, rightBound, 'left')
         distanceUsingLCA = self.DistanceAtAngle(candidatePoints, templatePoints, leftConvergentAngle)
@@ -87,12 +97,14 @@ class Recognizer:
         distanceUsingRCA = self.DistanceAtAngle(candidatePoints, templatePoints, rightConvergentAngle)
         while abs(rightBound - leftBound) > threshold:
             if distanceUsingLCA < distanceUsingRCA:
+                # Search to the left of right bound
                 rightBound = rightConvergentAngle
                 rightConvergentAngle = leftConvergentAngle
                 distanceUsingRCA = distanceUsingLCA
                 leftConvergentAngle = getConvergentAngle(leftBound, rightBound, 'left')
                 distanceUsingLCA = self.DistanceAtAngle(candidatePoints, templatePoints, leftConvergentAngle)
             else:
+                # Search to the right of left bound
                 leftBound = leftConvergentAngle
                 leftConvergentAngle = rightConvergentAngle
                 distanceUsingLCA = distanceUsingRCA
@@ -100,6 +112,7 @@ class Recognizer:
                 distanceUsingRCA = self.DistanceAtAngle(candidatePoints, templatePoints, rightConvergentAngle)
         return min(distanceUsingLCA, distanceUsingRCA)
     
+    # Get distance between user drawn gesture and template after rotating with a given angle
     def DistanceAtAngle(self, candidatePoints, templatePoints, angle):
         newpoints = self.rotate(candidatePoints, angle)
         return PathDistance(newpoints, templatePoints)
