@@ -36,25 +36,30 @@ Interaction -
 
 Part 2 
 
+Component A - Store the points
+When a mouse drag or screen touch event happens the draw method of board.py(lines 45-51) is triggered. It draws the points as well as stores the input in the points array on line 51.
+
+Component B - Storing the templates
+The template with 16 gestures is loaded in the template directory in the template.py file. It is then loaded into the recognizer module on line 8 on recognizer.py.
+
+Component C -Implement the 1$ algorithm
 Resampling 
-    The resampling is triggered on clicking the resample button. It fires up the resample function in the recognizer.py file. 
-    It calculates the avrage distance between each point and if the distance between two adjacent points is greater 
-    than the calculated average distance it inserts a new point in between them. 
+    The resampling is triggered when the drawing is over(when mouse is up). It fires up the onMouseUp function in the recognizer.py file. 
+    It calculates the average distance between each point and if the distance between two adjacent points is greater 
+    than the calculated average distance it inserts a new point in between them by interpolating it. 
 
 Rotate 
-
-    The centroid of the figure is calculated by running the rotate function in the recognizer.py file. It translates the 
-    points to the origin and calculates an indicative angle by which the figure is to be rotated. It then translates the points 
-    back to it original position. 
+    The centroid of the figure is calculated by running the rotate function in the recognizer.py file. It finds the indicative angle, which is the angle made between x-asix and the line passing through the centroid and the start-point of the figure. It the rotates the drawing by that indicative angle.
 
 Scale 
-    
-    The scale function is run which first calculates the coordinates of the bounding box and its height and width which basically 
-    indicates the total height and width of the figure. It then calculates the new points by multiplying each point by a constant value. 
-    This value is calculated by dividing the scale factor by the width for all the x coordinates and by height for all the y coordinates.\
+    The scale function is run which first calculates the coordinates of the bounding box and its height and width which basically indicates the total height and width of the figure. It then calculates the new points by multiplying each point by a constant value. This value is calculated by dividing the scale factor by the width for all the x coordinates and by height for all the y coordinates.
 
 Translate 
+    The translate function is run which takes an input of the destination coordinates to where the figure is to be translated.It then calculates the distance between the centroid and the destination coordinates(which is the origin) and then adds the difference to the x and y coordinates of each point.
 
-    The translate function is run which takes an input of the destination coordinates to where the figure is to be translated. 
-    It then calculates the distance between the centroid and the destination coordinates and then adds the difference to the x and y \
-    coordinates of each point.  
+Recognition
+    After resampling, rotating, scaling and translating both the user defined input and all the gestures in the template. For each user input, and for each gesture we find the best angle for which the distance between that user input and gesture is minimum. Then we compare these distances and find the gesture which has the minimum distance from user input which will be the ouput of the recognition. We also return the confidence score of the recignition for that gesture.
+
+Component D - Output the result
+
+When the recognizer.py module return the predicted gesture and the confidence score we print them using their respective lables on the canvas. We also display the resampled(red), rotated(orange) and scaled(green) figures seperately. 
