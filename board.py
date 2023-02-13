@@ -10,6 +10,8 @@ class Board:
         self.setBindings()
         self.points = []
         self.recognizer = Recognizer()
+        self.lx = 0
+        self.ly=0
 
     def createWidgets(self):
         self.board = Canvas(self.root, width=BOARD_WIDTH, height=BOARD_HEIGHT, bg=BOARD_BG)
@@ -20,6 +22,7 @@ class Board:
 
     def setBindings(self):
         # Creating bindings for board (draw handles mouse down and drag events)
+        self.board.bind(MOUSE_CLICK,self.lastcoordinates)
         self.board.bind(MOUSE_DRAG_MODE, self.draw) 
         self.board.bind(MOUSE_UP_MODE, self.mouseUp)
         self.board.pack()
@@ -41,31 +44,34 @@ class Board:
         self.confidenceLabel.configure(text="")
         print(LOG_BOARD_CLEARED)
 
+    def lastcoordinates(self,event):
+        global lx,ly
+        self.lx,self.ly=event.x,event.y
+
     # Draws when mouse drag or screen touch event occurs
     def draw(self, event):
-        x1 = (event.x-2)
-        y1 = (event.y-2)
-        x2 = (event.x+2)
-        y2 = (event.y+2)
-        self.board.create_oval(x1, y1, x2, y2, fill=BLUE, outline=BLUE)
+        global lx,ly
+        self.board.create_line((self.lx, self.ly, event.x, event.y),fill='red')
         self.points.append([event.x,event.y])
+        self.lx, self.ly = event.x,event.y
 
     # Draws different states of user input (resampled,rotated,scaled)
     def reDraw(self, points, color,fxn):
-        if fxn == "resample":
-            for i in range(len(points)):
-                x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
-                self.board.create_oval(x1+200, y1, x2+200, y2, fill=color, outline=color)
+        # if fxn == "resample":
+        #     for i in range(len(points)):
+        #         x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
+        #         self.board.create_oval(x1+200, y1, x2+200, y2, fill=color, outline=color)
 
-        if fxn == "rotated":
-            for i in range(len(points)):
-                x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
-                self.board.create_oval(x1+400, y1+100, x2+400, y2+100, fill=color, outline=color)
+        # if fxn == "rotated":
+        #     for i in range(len(points)):
+        #         x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
+        #         self.board.create_oval(x1+400, y1+100, x2+400, y2+100, fill=color, outline=color)
         
-        if fxn == "scaled":
-             for i in range(len(points)):
-                x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
-                self.board.create_oval(x1+400, y1, x2+400, y2, fill=color, outline=color)
+        # if fxn == "scaled":
+        #      for i in range(len(points)):
+        #         x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
+        #         self.board.create_oval(x1+400, y1, x2+400, y2, fill=color, outline=color)
+        print('done')
 
     # Mouse up event handler
     def mouseUp(self, event):

@@ -5,6 +5,7 @@ BOARD_HEIGHT = 600
 BOARD_BG = 'white' # background color of the canvas.  
 MOUSE_DRAG_MODE = '<B1-Motion>' # defines the action of the mouse
 MOUSE_UP_MODE = '<ButtonRelease-1>'
+MOUSE_CLICK = '<Button-1>'
 BOARD_DELETE_MODE = 'all' # defines what should be deleted on clicking the clear button. 
 CLEAR_BUTTON_TEXT = 'Clear Canvas'
 RESAMPLE= 'Resample'
