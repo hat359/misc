@@ -2,6 +2,9 @@ from tkinter import Canvas, Button,Label
 from constants import * # importing from constants.py
 from copy import deepcopy
 from recognizer import Recognizer
+import time
+
+
 
 class Board:
     def __init__(self, root):
@@ -12,12 +15,14 @@ class Board:
         self.recognizer = Recognizer()
         self.lx = 0
         self.ly=0
+        
 
     def createWidgets(self):
         self.board = Canvas(self.root, width=BOARD_WIDTH, height=BOARD_HEIGHT, bg=BOARD_BG)
         self.clearButton = Button(self.root, text=CLEAR_BUTTON_TEXT)
         self.predictedGestureLabel = Label(self.root)
         self.confidenceLabel = Label(self.root)
+        self.timelabel = Label(self.root)
         
 
     def setBindings(self):
@@ -34,6 +39,7 @@ class Board:
         # Create bindings for predicted gesture label and confidence label
         self.predictedGestureLabel.pack()
         self.confidenceLabel.pack()
+        self.timelabel.pack()
 
     # Handler for clear button click
     def onClearButtonClick(self):
@@ -41,7 +47,7 @@ class Board:
         # Clears everything on the canvas
         self.board.delete(BOARD_DELETE_MODE)
         self.predictedGestureLabel.configure(text="")
-        self.confidenceLabel.configure(text="")
+        self.timelabel.configure(text="")
         print(LOG_BOARD_CLEARED)
 
     def lastcoordinates(self,event):
@@ -51,7 +57,7 @@ class Board:
     # Draws when mouse drag or screen touch event occurs
     def draw(self, event):
         global lx,ly
-        self.board.create_line((self.lx, self.ly, event.x, event.y),fill='red')
+        self.board.create_line((self.lx, self.ly, event.x, event.y),fill='red',width=5)
         self.points.append([event.x,event.y])
         self.lx, self.ly = event.x,event.y
 
@@ -82,8 +88,13 @@ class Board:
         scaledPoints = self.recognizer.scale(rotatedPoints, SCALE_FACTOR)
         translatedPoints = self.recognizer.translate(scaledPoints, ORIGIN)
         self.reDraw(translatedPoints, GREEN,"scaled")
+        start = time.time()
         recognizedGesture = self.recognizer.recognizeGesture(translatedPoints)
-        print(recognizedGesture[0])
+        end = time.time()
+        temp = end -start
+        trunc = int(temp*1000)
         self.predictedGestureLabel.configure(text="Predicted Gesture = "  + str(recognizedGesture[0]))
         self.confidenceLabel.configure(text="Confidence = "  + str(recognizedGesture[1])) 
+        self.timelabel.configure(text="Time = "  + str(trunc) + " ms" ) 
+
         print(LOG_DRAWING_FINISHED)
