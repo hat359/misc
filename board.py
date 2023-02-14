@@ -13,8 +13,8 @@ class Board:
         self.setBindings()
         self.points = []
         self.recognizer = Recognizer()
-        self.lx = 0
-        self.ly=0
+        self.startPointX = 0
+        self.startPointY=0
         
 
     def createWidgets(self):
@@ -52,15 +52,15 @@ class Board:
         print(LOG_BOARD_CLEARED)
 
     def lastcoordinates(self,event):
-        global lx,ly
-        self.lx,self.ly=event.x,event.y
+        self.startPointX,self.startPointY=event.x,event.y
 
     # Draws when mouse drag or screen touch event occurs
     def draw(self, event):
-        global lx,ly
-        self.board.create_line((self.lx, self.ly, event.x, event.y),fill='red',width=5)
+        if len(self.points) == 0:
+            print('Start point:{} {}'.format(event.x,event.y))
+        self.board.create_line((self.startPointX, self.startPointY, event.x, event.y),fill='red',width=5)
         self.points.append([event.x,event.y])
-        self.lx, self.ly = event.x,event.y
+        self.startPointX, self.startPointY = event.x,event.y
 
     # Draws different states of user input (resampled,rotated,scaled)
     def reDraw(self, points, color,fxn):
@@ -96,6 +96,5 @@ class Board:
         trunc = int(temp*1000)
         self.predictedGestureLabel.configure(text="Predicted Gesture = "  + str(recognizedGesture[0]))
         self.confidenceLabel.configure(text="Confidence = "  + str(recognizedGesture[1])) 
-        self.timelabel.configure(text="Time = "  + str(trunc) + " ms" ) 
-
+        self.timelabel.configure(text="Time = "  + str(trunc) + " ms" )
         print(LOG_DRAWING_FINISHED)

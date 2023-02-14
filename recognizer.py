@@ -19,7 +19,7 @@ class Recognizer:
             points = self.scale(points, SCALE_FACTOR)
             points = self.translate(points, ORIGIN)
             self.template[gesture] = points
-        self.printTemplateStats()
+        # self.printTemplateStats()
     
     # Get individual gestures from template
     def getGestureFromTemplate(self, gesture):
