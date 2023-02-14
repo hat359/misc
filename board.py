@@ -48,6 +48,7 @@ class Board:
         self.board.delete(BOARD_DELETE_MODE)
         self.predictedGestureLabel.configure(text="")
         self.timelabel.configure(text="")
+        self.confidenceLabel.configure(text="")
         print(LOG_BOARD_CLEARED)
 
     def lastcoordinates(self,event):
