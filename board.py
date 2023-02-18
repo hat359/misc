@@ -2,9 +2,6 @@ from tkinter import Canvas, Button,Label
 from constants import * # importing from constants.py
 from copy import deepcopy
 from recognizer import Recognizer
-import time
-
-
 
 class Board:
     def __init__(self, root):
@@ -14,7 +11,7 @@ class Board:
         self.points = []
         self.recognizer = Recognizer()
         self.startPointX = 0
-        self.startPointY=0
+        self.startPointY = 0
         
 
     def createWidgets(self):
@@ -46,9 +43,6 @@ class Board:
         self.points.clear() 
         # Clears everything on the canvas
         self.board.delete(BOARD_DELETE_MODE)
-        self.predictedGestureLabel.configure(text="")
-        self.timelabel.configure(text="")
-        self.confidenceLabel.configure(text="")
         print(LOG_BOARD_CLEARED)
 
     def lastcoordinates(self,event):
@@ -56,45 +50,46 @@ class Board:
 
     # Draws when mouse drag or screen touch event occurs
     def draw(self, event):
-        if len(self.points) == 0:
-            print('Start point:{} {}'.format(event.x,event.y))
         self.board.create_line((self.startPointX, self.startPointY, event.x, event.y),fill='red',width=5)
         self.points.append([event.x,event.y])
         self.startPointX, self.startPointY = event.x,event.y
 
     # Draws different states of user input (resampled,rotated,scaled)
     def reDraw(self, points, color,fxn):
-        # if fxn == "resample":
-        #     for i in range(len(points)):
-        #         x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
-        #         self.board.create_oval(x1+200, y1, x2+200, y2, fill=color, outline=color)
+        if fxn == "resample":
+            for i in range(len(points)):
+                x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
+                self.board.create_oval(x1+200, y1, x2+200, y2, fill=color, outline=color)
 
-        # if fxn == "rotated":
-        #     for i in range(len(points)):
-        #         x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
-        #         self.board.create_oval(x1+400, y1+100, x2+400, y2+100, fill=color, outline=color)
+        if fxn == "rotated":
+            for i in range(len(points)):
+                x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
+                self.board.create_oval(x1+400, y1+100, x2+400, y2+100, fill=color, outline=color)
         
-        # if fxn == "scaled":
-        #      for i in range(len(points)):
-        #         x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
-        #         self.board.create_oval(x1+400, y1, x2+400, y2, fill=color, outline=color)
-        print('done')
+        if fxn == "scaled":
+             for i in range(len(points)):
+                x1, y1, x2, y2 = points[i][0]-2, points[i][1]-2, points[i][0]+2, points[i][1]+2
+                self.board.create_oval(x1+400, y1, x2+400, y2, fill=color, outline=color)
+
+    def populateLabels(self, recognizedGesture, score, time):
+        self.predictedGestureLabel.configure(text="Predicted Gesture = "  + str(recognizedGesture))
+        self.confidenceLabel.configure(text="Confidence = "  + str(round(score,2))) 
+        self.timelabel.configure(text="Time = "  + str(round(time*1000,2)) + " ms" )
+
+    def clearLables(self):
+        self.predictedGestureLabel.configure(text="")
+        self.timelabel.configure(text="")
+        self.confidenceLabel.configure(text="")
 
     # Mouse up event handler
     def mouseUp(self, event):
         resampledPoints = self.recognizer.resample(deepcopy(self.points), SAMPLING_POINTS)
-        self.reDraw(resampledPoints, RED,"resample")
+        # self.reDraw(resampledPoints, RED,"resample")
         rotatedPoints = self.recognizer.rotate(resampledPoints)
-        self.reDraw(rotatedPoints, ORANGE,"rotated")
+        # self.reDraw(rotatedPoints, ORANGE,"rotated")
         scaledPoints = self.recognizer.scale(rotatedPoints, SCALE_FACTOR)
         translatedPoints = self.recognizer.translate(scaledPoints, ORIGIN)
-        self.reDraw(translatedPoints, GREEN,"scaled")
-        start = time.time()
-        recognizedGesture = self.recognizer.recognizeGesture(translatedPoints)
-        end = time.time()
-        temp = end -start
-        trunc = int(temp*1000)
-        self.predictedGestureLabel.configure(text="Predicted Gesture = "  + str(recognizedGesture[0]))
-        self.confidenceLabel.configure(text="Confidence = "  + str(recognizedGesture[1])) 
-        self.timelabel.configure(text="Time = "  + str(trunc) + " ms" )
+        # self.reDraw(translatedPoints, GREEN,"scaled")
+        recognizedGesture, score, time = self.recognizer.recognizeGesture(translatedPoints)
+        self.populateLabels(recognizedGesture, score, time)
         print(LOG_DRAWING_FINISHED)

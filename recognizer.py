@@ -2,6 +2,7 @@ from templates import template1
 from constants import *
 from math import sqrt
 from recognizerUtils import *
+from time import time
 
 class Recognizer:
     def __init__(self):
@@ -78,6 +79,7 @@ class Recognizer:
 
     # Recognize the gesture by comparing the user drawn gesture with template
     def recognizeGesture(self, points):
+        startTime = time()
         bestDistance = float("inf")
         recognizedGesture = None
         for gesture, templatePoints in self.template.items():
@@ -87,7 +89,8 @@ class Recognizer:
                 recognizedGesture = gesture
         # Calculate confidence of best matching gesture template
         score = 1 - bestDistance/(0.5*sqrt(SCALE_FACTOR**2 + SCALE_FACTOR**2))
-        return recognizedGesture, score
+        endTime = time()
+        return recognizedGesture, score, endTime - startTime
 
     # Get the optimal angle for best distance bewteen user drawn gesture and all templates
     def DistanceAtBestAngle(self, candidatePoints, templatePoints, leftBound, rightBound, threshold):
