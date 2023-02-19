@@ -9,16 +9,20 @@ class Recognizer:
         self.template = template1.template
         self.preProcessTemplates()
 
+    def getPreProcessPoints(self, points):
+        points = self.resample(points, SAMPLING_POINTS)
+        points = self.rotate(points)
+        points = self.scale(points, SCALE_FACTOR)
+        points = self.translate(points, ORIGIN)
+        return points
+
     # Apply the resampling, rotating, scaling and translate operations to templates    
     def preProcessTemplates(self):
         template = self.template
         self.template = {}
         for gesture in template.keys():
             points = template[gesture]
-            points = self.resample(points, SAMPLING_POINTS)
-            points = self.rotate(points)
-            points = self.scale(points, SCALE_FACTOR)
-            points = self.translate(points, ORIGIN)
+            points = self.getPreProcessPoints(points)
             self.template[gesture] = points
         # self.printTemplateStats()
     
