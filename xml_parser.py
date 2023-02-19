@@ -1,12 +1,33 @@
 import os
+import xml.etree.ElementTree as ET
 
 class Parser():
     def __init__(self):
-        offline_data = {}
+        self.offline_data = {}
         rootdir = os.getcwd() + "/xml_logs/"
         for directory in os.listdir(rootdir):
             user = os.path.join(rootdir, directory)
+            userName = user.split("/")[-1]
             if os.path.isdir(user):
-                for 
-
-parser = Parser()
+                self.offline_data[userName] = {}
+                for speed in os.listdir(user):
+                    self.offline_data[userName][speed] = {}
+                    for fileName in os.listdir(user + "/" + speed):
+                        gestureName = self.getCleanedFileName(fileName)
+                        if gestureName in self.offline_data[userName][speed]:
+                            self.offline_data[userName][speed][gestureName] = self.getCoordinatesFromXML(user + "/" + speed + "/" + fileName)
+                        else:
+                            self.offline_data[userName][speed][gestureName] = []
+                            self.offline_data[userName][speed][gestureName] = self.getCoordinatesFromXML(user + "/" + speed + "/" + fileName)
+    
+    def getCoordinatesFromXML(self, fileLocation):
+        points = []
+        root = ET.parse(fileLocation).getroot()
+        for child in root:
+            points.append([child.attrib['X'], child.attrib['Y']])
+        return points
+    
+    def getCleanedFileName(self, fileName):
+        fileName = fileName.replace(".xml", "")
+        res = "".join(filter(lambda x: not x.isdigit(), fileName))
+        return res
