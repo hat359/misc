@@ -5,9 +5,12 @@ from recognizerUtils import *
 from time import time
 
 class Recognizer:
-    def __init__(self):
-        self.template = template1.template
-        self.preProcessTemplates()
+    def __init__(self, training_set=None):
+        if training_set == None:
+            self.template = template1.template
+            self.preProcessTemplates()
+        else:
+            self.template = training_set
 
     def getPreProcessPoints(self, points):
         points = self.resample(points, SAMPLING_POINTS)
