@@ -88,16 +88,22 @@ class Recognizer:
     def recognizeGesture(self, points):
         startTime = time()
         bestDistance = float("inf")
+        tempList={}
         recognizedGesture = None
         for gesture, templatePoints in self.template.items():
             distance = self.DistanceAtBestAngle(points, templatePoints, radians(-45), radians(45), radians(2))
+            tempScore= 1 - distance/(0.5*sqrt(SCALE_FACTOR**2 + SCALE_FACTOR**2))
+            tempList[gesture.split('/')[0]]=tempScore
             if distance < bestDistance:
                 bestDistance = distance
                 recognizedGesture = gesture
+                
         # Calculate confidence of best matching gesture template
         score = 1 - bestDistance/(0.5*sqrt(SCALE_FACTOR**2 + SCALE_FACTOR**2))
         endTime = time()
-        return recognizedGesture, score, endTime - startTime
+        Nbest = dict(sorted(tempList.items(), key=lambda x:x[1], reverse=True))
+
+        return recognizedGesture, score, endTime - startTime,Nbest
 
     # Get the optimal angle for best distance bewteen user drawn gesture and all templates
     def DistanceAtBestAngle(self, candidatePoints, templatePoints, leftBound, rightBound, threshold):
