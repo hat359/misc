@@ -27,6 +27,8 @@ class OfflineRecognizer():
     def recognizeOfflineData(self):
         score = {}
         logcsv = []
+        total=0
+        correct=0
         for user in self.preProcessedData: # For each user
             score[user] = {}
             for example in range(1,3): # For each example from 1 to 9
@@ -46,12 +48,16 @@ class OfflineRecognizer():
                             score[user][example][gesture] = 0
                         recognizedGesture, _, _,Nbest = recognizer.recognizeGesture(points)
                         # print(recognizedGesture)
-                        log = {'User':user,'Gesture':gesture,'Iteration':i,'Example':example,'TrainingSize':len(training_set),'TrainingContents':training_set,'RecognizedGesture':recognizedGesture,'Nbest':Nbest}
+                        log = {'User':user,'Gesture':gesture,'Iteration':i,'Example':example,'TrainingSize':len(training_set),'TrainingContents':training_set,'RecognizedGesture':recognizedGesture.split('/')[0],'CorrectIncorrect':0 if recognizedGesture.split('/')[0]==gesture else 1,'RecoResult':list(Nbest.values())[0],'RecoResultBestMatch[specific-instance]':recognizedGesture,'Nbest':Nbest}
                         
                         logcsv.append(log)
                         recognizedGesture = recognizedGesture.split('/')[0] if recognizedGesture!=None else ''
                         if recognizedGesture == gesture:
                             score[user][example][gesture] += 1
+                            correct+=1
+                        total+=1
+
+        print((correct/total)*100)               
         self.writeToFile(dumps(score), 'score.json')
         self.writeToCsv(logcsv,'logfile.csv')
     
@@ -72,7 +78,7 @@ class OfflineRecognizer():
                 
 
     def writeToCsv(self,dict_data,filename):
-        csv_columns = ['User','Gesture','Iteration','Example','TrainingSize','TrainingContents','RecognizedGesture','Nbest']
+        csv_columns = ['User','Gesture','Iteration','Example','TrainingSize','TrainingContents','RecognizedGesture','CorrectIncorrect','RecoResult','RecoResultBestMatch[specific-instance]','Nbest']
         csv_file=filename
         try:
             with open(csv_file, 'w') as csvfile:
