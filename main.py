@@ -1,3 +1,5 @@
+#Authors - Harsh Athavale & Abdul Samadh Azath
+
 from tkinter import Tk #tkinter library for GUI 
 from board import Board #board.py contains all the functions. 
 from offline_recognizer import OfflineRecognizer

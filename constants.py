@@ -1,3 +1,5 @@
+#Authors - Harsh Athavale & Abdul Samadh Azath
+
 #this file has all the constants that are utilized in the code. 
 
 BOARD_WIDTH = 1000 # width and height of the canvas

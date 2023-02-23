@@ -1,3 +1,5 @@
+#Authors - Harsh Athavale & Abdul Samadh Azath
+
 from tkinter import Canvas, Button,Label
 from constants import * # importing from constants.py
 from copy import deepcopy

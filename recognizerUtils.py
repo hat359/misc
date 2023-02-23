@@ -1,3 +1,5 @@
+#Authors - Harsh Athavale & Abdul Samadh Azath
+
 from math import sqrt,pi,atan2,cos,sin
 from constants import *
 
