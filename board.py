@@ -6,12 +6,12 @@ from copy import deepcopy
 from recognizer import Recognizer
 
 class Board:
-    def __init__(self, root):
+    def __init__(self, root, recognizer):
         self.root = root
         self.createWidgets()
         self.setBindings()
         self.points = []
-        self.recognizer = Recognizer()
+        self.recognizer = recognizer
         self.startPointX = 0
         self.startPointY = 0
         
@@ -52,7 +52,7 @@ class Board:
 
     # Draws when mouse drag or screen touch event occurs
     def draw(self, event):
-        self.board.create_line((self.startPointX, self.startPointY, event.x, event.y),fill='red',width=5)
+        self.board.create_line((self.startPointX, self.startPointY, event.x, event.y),fill=BLUE,width=5)
         self.points.append([event.x,event.y])
         self.startPointX, self.startPointY = event.x,event.y
 
@@ -92,6 +92,6 @@ class Board:
         scaledPoints = self.recognizer.scale(rotatedPoints, SCALE_FACTOR)
         translatedPoints = self.recognizer.translate(scaledPoints, ORIGIN)
         # self.reDraw(translatedPoints, GREEN,"scaled")
-        recognizedGesture, score, time = self.recognizer.recognizeGesture(translatedPoints)
+        recognizedGesture, score, time , _= self.recognizer.recognizeGesture(translatedPoints)
         self.populateLabels(recognizedGesture, score, time)
         print(LOG_DRAWING_FINISHED)
