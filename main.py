@@ -3,7 +3,6 @@
 from tkinter import Tk #tkinter library for GUI 
 from board import Board #board.py contains all the functions. 
 from offline_recognizer import OfflineRecognizer
-from recognizer import Recognizer
 
 def main():
     startOnlineRecognizer()
@@ -11,8 +10,7 @@ def main():
 
 def startOnlineRecognizer():
     root = Tk() #initializig the tkinter lib. 
-    recognizer = Recognizer()
-    board = Board(root, recognizer) 
+    board = Board(root, 'recognition') 
     root.mainloop()
 
 def startOfflineRecognizer():

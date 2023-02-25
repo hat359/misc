@@ -6,35 +6,62 @@ from copy import deepcopy
 from recognizer import Recognizer
 
 class Board:
-    def __init__(self, root, recognizer):
+    def __init__(self, root, mode):
         self.root = root
-        self.createWidgets()
-        self.setBindings()
-        self.points = []
-        self.recognizer = recognizer
-        self.startPointX = 0
-        self.startPointY = 0
-        
-
-    def createWidgets(self):
+        self.mode = mode
+        if self.mode == 'recognition':
+            self.createCanvas()
+            self.createClearButton()
+            self.createPredictionLabels()
+            self.setMouseBindings()
+            self.setClearButtonBindings()
+            self.setPredictionLabelsBindings()
+            self.points = []
+            self.recognizer = Recognizer()
+            self.startPointX = 0
+            self.startPointY = 0
+        elif self.mode == 'collection':
+            self.points = []
+            self.startPointX = 0
+            self.startPointY = 0
+            self.createCanvas()
+            self.createClearButton()
+            self.setMouseBindings()
+            self.setClearButtonBindings()
+            # # To be added
+            # 1. DB module to store user points with user id in a json
+            # 2. Show sample drawing on top right
+            # 3. Add button to submit user input
+            # 4. Add label to show prompt to be drawn
+            # 5. Add logic to show prompt and store points
+            # 6. Add text box to get user ID and any other user data
+            # 7. Convert json to xml 
+    
+    def createCanvas(self):
         self.board = Canvas(self.root, width=BOARD_WIDTH, height=BOARD_HEIGHT, bg=BOARD_BG)
+
+    def createClearButton(self):
         self.clearButton = Button(self.root, text=CLEAR_BUTTON_TEXT)
+
+    def createPredictionLabels(self):
         self.predictedGestureLabel = Label(self.root)
         self.confidenceLabel = Label(self.root)
-        self.timelabel = Label(self.root)
-        
+        self.timelabel = Label(self.root)     
 
-    def setBindings(self):
+    def setMouseBindings(self):
         # Creating bindings for board (draw handles mouse down and drag events)
-        self.board.bind(MOUSE_CLICK,self.lastcoordinates)
-        self.board.bind(MOUSE_DRAG_MODE, self.draw) 
-        self.board.bind(MOUSE_UP_MODE, self.mouseUp)
+        self.board.bind(MOUSE_CLICK,self.getLastCoordinates)
+        self.board.bind(MOUSE_DRAG_MODE, self.draw)
+        if self.mode == 'recognition':
+            self.board.bind(MOUSE_UP_MODE, self.mouseUp)
         self.board.pack()
-
+    
+    def setClearButtonBindings(self):
         #Creating bindings for clear button
         self.clearButton.configure(command=self.onClearButtonClick)
         self.clearButton.pack()
 
+    def setPredictionLabelsBindings(self):
         # Create bindings for predicted gesture label and confidence label
         self.predictedGestureLabel.pack()
         self.confidenceLabel.pack()
@@ -47,7 +74,7 @@ class Board:
         self.board.delete(BOARD_DELETE_MODE)
         print(LOG_BOARD_CLEARED)
 
-    def lastcoordinates(self,event):
+    def getLastCoordinates(self,event):
         self.startPointX,self.startPointY=event.x,event.y
 
     # Draws when mouse drag or screen touch event occurs
