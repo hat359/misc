@@ -6,6 +6,12 @@ from copy import deepcopy
 from recognizer import Recognizer
 from database import Database
 from random import shuffle
+import json
+import xmltodict
+import tkinter as tk
+
+
+
 
 class Board:
     def __init__(self, root, mode):
@@ -20,6 +26,7 @@ class Board:
             self.startPointX = 0
             self.startPointY = 0
         elif self.mode == 'collection':
+           
             self.gestureList = GESTURE_LIST
             self.currentUserId = 'sampleUser'
             self.currentGesture = 'sampleGesture'
@@ -35,12 +42,13 @@ class Board:
             # 2. Show sample drawing on top right
             # 3. Add button to submit user input - Done
             self.createSubmitButton()
+            self.createInputBox()
             # 4. Add label to show prompt to be drawn - Done
             self.createPromptLabel()
             self.setPromptLabel('Prompt label sample text.')
             # 5. Add logic to show prompt and store points - Inprogress
-            # 6. Add text box to get user ID and any other user data
-            # 7. Convert json(database.json) to xml
+            # 6. Add text box to get user ID and any other user data - Done
+            # 7. Convert json(database.json) to xml - Done
     
     # def collectFromUser(self, userId):
     #     # Delete any existing user with same userId in DB and start fresh
@@ -54,6 +62,7 @@ class Board:
     def createCanvas(self):
         self.board = Canvas(self.root, width=BOARD_WIDTH, height=BOARD_HEIGHT, bg=BOARD_BG)
         self.setMouseBindings()
+        self.dictToxml()
         self.board.pack()
 
     def createUserIdTextBox(self):
@@ -68,6 +77,15 @@ class Board:
         self.submitButton = Button(self.root, text=SUBMIT_BUTTON_TEXT)
         self.submitButton.configure(command=self.onSubmitButtonClick)
         self.submitButton.pack()
+
+    def createSubmitButton(self):
+        self.submitButton = Button(self.root, text=SUBMIT_BUTTON_TEXT)
+        # self.submitButton.pack()
+
+
+    def createInputBox(self):
+        self.entry = tk.Entry(self.board)
+        self.board.create_window(150, 100, window=self.entry)
 
     def createPredictionLabels(self):
         self.predictedGestureLabel = Label(self.root)
@@ -150,6 +168,21 @@ class Board:
         scaledPoints = self.recognizer.scale(rotatedPoints, SCALE_FACTOR)
         translatedPoints = self.recognizer.translate(scaledPoints, ORIGIN)
         # self.reDraw(translatedPoints, GREEN,"scaled")
-        recognizedGesture, score, time , _= self.recognizer.recognizeGesture(translatedPoints)
-        self.setPredictionLabels(recognizedGesture, score, time)
+        recognizedGesture, score, time,_ = self.recognizer.recognizeGesture(translatedPoints)
+        self.populateLabels(recognizedGesture, score, time)
         print(LOG_DRAWING_FINISHED)
+
+
+    def dictToxml(self):
+      with open('./database.json', 'r') as f:
+        data = json.load(f)
+        xml = xmltodict.unparse(data, pretty=True)
+        
+        with open('output.xml', 'w') as f:
+            f.write(xml)
+
+
+        
+
+
+

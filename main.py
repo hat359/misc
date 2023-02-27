@@ -10,7 +10,7 @@ def main():
 
 def startOnlineRecognizer():
     root = Tk() #initializig the tkinter lib. 
-    board = Board(root, 'collection') 
+    board = Board(root,'collection') 
     root.mainloop()
 
 def startOfflineRecognizer():
