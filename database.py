@@ -16,8 +16,10 @@ class Database():
             del self.data[userId]
         # Add user to database
         self.data[userId] = {}
+        # print(self.data[userId])
 
     def addGesture(self, userId, gesture, points):
+        # print(self.data)
         if gesture not in self.data[userId]:
             print("gesture not in database and user")
             self.data[userId][gesture] = []

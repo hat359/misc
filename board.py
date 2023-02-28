@@ -34,18 +34,23 @@ class Board:
             self.startPointX = 0
             self.startPointY = 0
             self.createCanvas()
-            self.createClearButton()
+            # self.createClearButton()
+            self.createNextButton()
+            
+            self.counter=1
             # # To be added
             # 1. DB module to store user points with user id in a json - Done
             self.db = Database()
-            self.db.addUser('sampleUser')
+            # self.db.addUser('sampleUser')
             # 2. Show sample drawing on top right
             # 3. Add button to submit user input - Done
-            self.createSubmitButton()
+            # self.createSubmitButton()
             self.createInputBox()
             # 4. Add label to show prompt to be drawn - Done
             self.createPromptLabel()
-            self.setPromptLabel('Prompt label sample text.')
+            self.userData()
+            self.createAddUserButton()
+            # self.setPromptLabel('Prompt label sample text.')
             # 5. Add logic to show prompt and store points - Inprogress
             # 6. Add text box to get user ID and any other user data - Done
             # 7. Convert json(database.json) to xml - Done
@@ -78,9 +83,16 @@ class Board:
         self.submitButton.configure(command=self.onSubmitButtonClick)
         self.submitButton.pack()
 
-    def createSubmitButton(self):
-        self.submitButton = Button(self.root, text=SUBMIT_BUTTON_TEXT)
-        # self.submitButton.pack()
+    def createAddUserButton(self):
+        self.addUserButton = Button(self.root, text=ADD_BUTTON_TEXT)
+        self.addUserButton.configure(command=self.addUser)
+        self.addUserButton.pack()
+
+    def createNextButton(self):
+        self.nextButton = Button(self.root, text=NEXT_BUTTON_TEXT)
+        self.nextButton.configure(command=self.onNextButtonClick)
+        self.nextButton.pack()
+
 
 
     def createInputBox(self):
@@ -109,9 +121,11 @@ class Board:
     def createPromptLabel(self):
         self.promptLabel = Label(self.root)
         self.promptLabel.pack()
+        
     
     def setPromptLabel(self,message):
         self.promptLabel.configure(text=message)
+        self.currentGesture=message
 
     def setMouseBindings(self):
         # Creating bindings for board (draw handles mouse down and drag events)
@@ -119,7 +133,15 @@ class Board:
         self.board.bind(MOUSE_DRAG_MODE, self.draw)
         if self.mode == 'recognition':
             self.board.bind(MOUSE_UP_MODE, self.mouseUp)
-        
+        if self.mode=='collection':
+             self.board.bind(MOUSE_UP_MODE, self.mouseUpData)
+
+    
+    def addUser(self):
+        UserId = self.entry.get()
+        print(UserId)
+        self.db.addUser(UserId)
+
     # Handler for clear button click
     def onClearButtonClick(self):
         self.points.clear() 
@@ -133,12 +155,23 @@ class Board:
         print("After:", self.db.getData())
         self.points.clear()
 
+
+    def onNextButtonClick(self):
+        
+       
+        self.db.addGesture(self.entry.get(), self.currentGesture, deepcopy(self.points))
+        self.points.clear()
+        self.board.delete(BOARD_DELETE_MODE)
+        self.userData()
+
+
+
     def getLastCoordinates(self,event):
         self.startPointX,self.startPointY=event.x,event.y
 
     # Draws when mouse drag or screen touch event occurs
     def draw(self, event):
-        self.board.create_line((self.startPointX, self.startPointY, event.x, event.y),fill=BLUE,width=5)
+        self.board.create_line((self.startPointX, self.startPointY, event.x, event.y),fill=BLUE,width=5,tags='gesture')
         self.points.append([event.x,event.y])
         self.startPointX, self.startPointY = event.x,event.y
 
@@ -171,6 +204,30 @@ class Board:
         recognizedGesture, score, time,_ = self.recognizer.recognizeGesture(translatedPoints)
         self.populateLabels(recognizedGesture, score, time)
         print(LOG_DRAWING_FINISHED)
+
+    def mouseUpData(self, event):
+        print("sd")
+        
+
+
+
+    def userData(self):
+        labels = {1:'triangle',2:'x',3:'rectangle',4:'circle',5:'check',6:'caret',7:'zigzag',8:'arrow',9:'left_square_bracket'
+        ,10:'right_square_bracket',11:'v',12:'delete',13:'left_curly_brace',14:'right_curly_brace',15:'star',16:'pigtail'}
+
+        if self.counter >160:
+            self.setPromptLabel("Completed")
+        else:
+            ind  = self.counter%17
+            if ind ==0:
+                ind = 1
+            self.setPromptLabel(labels[ind])
+            self.counter+=1
+
+
+
+
+
 
 
     def dictToxml(self):
